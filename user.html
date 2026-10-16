@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #26354a;
+        }
+
+        header {
+            background: #173b70;
+            color: white;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        main { padding: 25px 5%; }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 18px;
+        }
+
+        .card, .panel {
+            background: white;
+            padding: 22px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #0001;
+            margin-bottom: 20px;
+        }
+
+        .card h3 { color: #64748b; font-size: 15px; }
+        .number { font-size: 28px; font-weight: bold; color: #1769aa; }
+
+        button {
+            background: #1769aa;
+            color: white;
+            border: 0;
+            padding: 10px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 450px;
+        }
+
+        th, td {
+            padding: 13px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+        }
+
+        th { background: #f8fafc; }
+
+        .table-wrap { overflow-x: auto; }
+
+        .present { color: #15803d; font-weight: bold; }
+        .absent { color: #dc2626; font-weight: bold; }
+
+        @media (max-width: 500px) {
+            header { padding: 16px; }
+            main { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div>
+        <h2>Student Dashboard</h2>
+        <span>Attendance Management System</span>
+    </div>
+    <button onclick="logout()">Logout</button>
+</header>
+
+<main>
+    <section class="panel">
+        <h2>Welcome, Student!</h2>
+        <p>Student ID: <strong>S001</strong></p>
+        <p>Name: <strong>Rahul Kumar</strong></p>
+    </section>
+
+    <section class="cards">
+        <div class="card">
+            <h3>Total Classes</h3>
+            <div class="number" id="total">0</div>
+        </div>
+
+        <div class="card">
+            <h3>Present Classes</h3>
+            <div class="number" id="present">0</div>
+        </div>
+
+        <div class="card">
+            <h3>Absent Classes</h3>
+            <div class="number" id="absent">0</div>
+        </div>
+
+        <div class="card">
+            <h3>Attendance</h3>
+            <div class="number" id="percentage">0%</div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Attendance History</h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="history"></tbody>
+            </table>
+        </div>
+        <p id="empty"></p>
+    </section>
+</main>
+
+<script>
+    if (sessionStorage.getItem("attendanceRole") !== "student") {
+        window.location.replace("index.html");
+    }
+
+    const studentsKey = "attendanceStudents";
+    const recordsKey = "attendanceRecords";
+
+    // Add initial demo data if this is the first visit
+    if (!localStorage.getItem(studentsKey)) {
+        localStorage.setItem(studentsKey, JSON.stringify([
+            { id: "S001", name: "Rahul Kumar" },
+            { id: "S002", name: "Priya Sharma" },
+            { id: "S003", name: "Arjun Reddy" }
+        ]));
+    }
+
+    if (!localStorage.getItem(recordsKey)) {
+        localStorage.setItem(recordsKey, JSON.stringify([]));
+    }
+
+    function loadAttendance() {
+        const records = JSON.parse(
+            localStorage.getItem(recordsKey) || "[]"
+        );
+
+        const mine = records.filter(r => r.id === "S001");
+        const presentCount = mine.filter(
+            r => r.status === "Present"
+        ).length;
+        const absentCount = mine.filter(
+            r => r.status === "Absent"
+        ).length;
+
+        document.getElementById("total").textContent = mine.length;
+        document.getElementById("present").textContent = presentCount;
+        document.getElementById("absent").textContent = absentCount;
+
+        const percent = mine.length
+            ? Math.round(presentCount / mine.length * 100)
+            : 0;
+
+        document.getElementById("percentage").textContent = percent + "%";
+
+        const history = document.getElementById("history");
+        history.replaceChildren();
+
+        mine.sort((a, b) => b.date.localeCompare(a.date));
+
+        mine.forEach(record => {
+            const tr = document.createElement("tr");
+            const dateCell = document.createElement("td");
+            const statusCell = document.createElement("td");
+
+            dateCell.textContent = record.date;
+            statusCell.textContent = record.status;
+            statusCell.className =
+                record.status === "Present" ? "present" : "absent";
+
+            tr.append(dateCell, statusCell);
+            history.appendChild(tr);
+        });
+
+        document.getElementById("empty").textContent =
+            mine.length ? "" : "No attendance records available yet.";
+    }
+
+    function logout() {
+        sessionStorage.removeItem("attendanceRole");
+        window.location.href = "index.html";
+    }
+
+    loadAttendance();
+</script>
+
+</body>
+</html>

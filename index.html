@@ -1,0 +1,131 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Management System</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #eef3f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .login-box {
+            background: white;
+            padding: 35px;
+            width: 350px;
+            max-width: 92%;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px #0002;
+        }
+
+        h2 {
+            text-align: center;
+            color: #173b70;
+        }
+
+        p {
+            text-align: center;
+            color: #666;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        button {
+            background: #1769aa;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 22px;
+        }
+
+        button:hover {
+            background: #104d80;
+        }
+
+        .hint {
+            font-size: 13px;
+            line-height: 1.8;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-box">
+    <h2>Student Attendance</h2>
+    <p>Login to continue</p>
+
+    <form id="loginForm">
+        <label for="role">Login as</label>
+        <select id="role">
+            <option value="student">Student</option>
+            <option value="admin">Admin</option>
+        </select>
+
+        <label for="username">Username</label>
+        <input id="username" required placeholder="Enter username">
+
+        <label for="password">Password</label>
+        <input id="password" type="password"
+               required placeholder="Enter password">
+
+        <button type="submit">Login</button>
+    </form>
+
+    <p class="hint">
+        Student: student / 1234<br>
+        Admin: admin / admin123
+    </p>
+</div>
+
+<script>
+    document.getElementById("loginForm").addEventListener("submit",
+        function(event) {
+            event.preventDefault();
+
+            const role = document.getElementById("role").value;
+            const username = document.getElementById("username").value.trim();
+            const password = document.getElementById("password").value;
+
+            if (role === "student" &&
+                username === "student" && password === "1234") {
+                sessionStorage.setItem("attendanceRole", "student");
+                window.location.href = "user.html";
+            }
+            else if (role === "admin" &&
+                     username === "admin" && password === "admin123") {
+                sessionStorage.setItem("attendanceRole", "admin");
+                window.location.href = "admin.html";
+            }
+            else {
+                alert("Invalid username or password!");
+            }
+        }
+    );
+</script>
+
+</body>
+</html>
+```
